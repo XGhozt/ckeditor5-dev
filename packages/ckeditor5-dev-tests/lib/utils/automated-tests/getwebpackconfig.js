@@ -37,14 +37,17 @@ module.exports = function getWebpackConfigForAutomatedTests( options ) {
 								}
 							}
 						},
+						'css-loader',
 						{
 							loader: 'postcss-loader',
-							options: getPostCssConfig( {
-								themeImporter: {
-									themePath: options.themePath
-								},
-								minify: true
-							} )
+							options: {
+								postcssOptions: getPostCssConfig( {
+									themeImporter: {
+										themePath: getThemePath( options )
+									},
+									minify: true
+								} )
+							}
 						}
 					]
 				},
@@ -55,7 +58,7 @@ module.exports = function getWebpackConfigForAutomatedTests( options ) {
 				{
 					test: /\.js$/,
 					loader: require.resolve( '../ck-debug-loader' ),
-					query: {
+					options: {
 						debugFlags: options.debug
 					}
 				}
@@ -88,7 +91,7 @@ module.exports = function getWebpackConfigForAutomatedTests( options ) {
 				exclude: [
 					new RegExp( `${ escapedPathSep }(lib)${ escapedPathSep }` )
 				],
-				query: {
+				options: {
 					esModules: true
 				}
 			}
@@ -131,4 +134,15 @@ function getPathsToIncludeForCoverage( globs ) {
 		} )
 		// Filter undefined ones.
 		.filter( path => path );
+}
+
+function getThemePath( options ) {
+	if ( options.themePath ) {
+		return options.themePath;
+	}
+
+	const themePackagePath = path.join( process.cwd(), 'node_modules', '@ckeditor/ckeditor5-theme-lark' );
+	const themePackageJson = require( path.join( themePackagePath, 'package.json' ) );
+
+	return path.join( themePackagePath, themePackageJson.main );
 }
