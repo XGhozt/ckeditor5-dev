@@ -19,13 +19,15 @@
  */
 module.exports = function getPostCssConfig( options = {} ) {
 	const config = {
-		plugins: [
-			require( 'postcss-import' )(),
-			require( './themeimporter' )( options.themeImporter ),
-			require( 'postcss-mixins' )(),
-			require( 'postcss-nesting' )(),
-			require( './themelogger' )()
-		]
+		postcssOptions: {
+			plugins: [
+				require( 'postcss-import' )(),
+				require( './themeimporter' )( options.themeImporter ),
+				require( 'postcss-mixins' )(),
+				require( 'postcss-nesting' )(),
+				require( './themelogger' )()
+			]
+		}
 	};
 
 	if ( options.sourceMap ) {
@@ -33,7 +35,7 @@ module.exports = function getPostCssConfig( options = {} ) {
 	}
 
 	if ( options.minify ) {
-		config.plugins.push( require( 'cssnano' )( {
+		config.postcssOptions.plugins.push( require( 'cssnano' )( {
 			preset: 'default',
 			autoprefixer: false,
 			reduceIdents: false
